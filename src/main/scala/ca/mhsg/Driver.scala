@@ -4,13 +4,13 @@ import java.util
 import java.util.Properties
 
 import io.confluent.kafka.serializers.{AbstractKafkaAvroSerDeConfig, KafkaAvroDeserializer}
+import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
 
 import scala.collection.JavaConverters._
 
 /**
-  * kafka-console-producer --request-required-acks 1 --broker-list kafka:9092 --topic test --property "parse.key=true" --property "key.separator=:"
   * kafka-avro-console-producer --broker-list kafka:9092 --topic test-topic --property parse.key=true --property key.separator=: --property key.schema='{"type":"string"}' --property value.schema='{"type":"record","name":"testRecord","fields":[{"name":"id","type":"long"}]}'
   * java -jar /Users/mohammad/Projects/docker-playground/target/scala-2.11/docker-playground-assembly-0.1.jar  tester kafka:9092 http://schema-registry:8082 test-topic
   *
@@ -26,8 +26,9 @@ object Driver {
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, classOf[StringDeserializer])
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, classOf[KafkaAvroDeserializer])
     props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, args(2))
+    println(props)
 
-    val consumer = new KafkaConsumer[String, String](props)
+    val consumer = new KafkaConsumer[String, GenericRecord](props)
     val topics = new util.ArrayList[String]()
     topics.add(args(3))
     consumer.subscribe(topics)

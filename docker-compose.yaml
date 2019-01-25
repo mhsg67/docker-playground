@@ -1,6 +1,3 @@
-# kafka-avro-console-producer --broker-list kafka:9092 --topic test-topic --property parse.key=true --property key.separator=: --property key.schema='{"type":"string"}' --property value.schema='{"type":"record","name":"testRecord","fields":[{"name":"id","type":"long"}]}'
-# kafka-avro-console-consumer --topic test-topic --bootstrap-server kafka:9092 --property parse.key=true --property key.separator=: --from-beginning
-
 version: "3"
 services:
   zookeeper:
@@ -10,9 +7,6 @@ services:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: "2181"
-    volumes:
-      - "/Users/mohammad/Documents/docker/zookeeper-data:/var/lib/zookeeper/data"
-      - "/Users/mohammad/Documents/docker/zookeeper-txn-log:/var/lib/zookeeper/log"
 
   kafka:
     container_name: kafka
@@ -25,8 +19,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-    volumes:
-      - "/Users/mohammad/Documents/docker/kafka:/var/lib/kafka/data"
 
   schema-registry:
     container_name: schema-registry
@@ -40,3 +32,13 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
       SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+
+  application:
+    build:
+      context: /Users/mohammad/Projects/docker-playground
+      dockerfile: Dockerfile
+    image: test-application:latest
+    container_name: application
+    depends_on:
+      - cassandra
+      - schema-registry

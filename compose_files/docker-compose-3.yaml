@@ -7,6 +7,7 @@ services:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: "2181"
+
   kafka:
     container_name: kafka
     image: confluentinc/cp-kafka:5.1.0
@@ -18,6 +19,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+
   schema-registry:
     container_name: schema-registry
     image: confluentinc/cp-schema-registry:5.1.0
@@ -30,20 +32,13 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
       SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
-  cassandra:
-    image: cassandra
-    container_name: cassandra
-    ports:
-      - 9042:9042
-      - 7199:7199
+
   application:
+    build:
+      context: /Users/mohammad/Projects/docker-playground
+      dockerfile: Dockerfile
     image: test-application:latest
     container_name: application
     depends_on:
       - cassandra
       - schema-registry
-
-#services
-#  build:
-#    context: /home/me/app
-#    dockerfile: docker/Dockerfile
